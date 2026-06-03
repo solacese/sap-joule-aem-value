@@ -127,6 +127,7 @@
     max-width: 800px; animation: fadeInUp .8s var(--ease) .3s both;
   }
   .hero h1 span { color: var(--accent); }
+  .hero h1 .nowrap { white-space: nowrap; color: inherit; }
   .hero .sub {
     font-size: clamp(18px, 2.2vw, 22px); color: rgba(255,255,255,.75);
     max-width: 680px; margin-top: 24px; font-weight: 400; line-height: 1.6;
@@ -237,7 +238,7 @@
 
   .play-card {
     background: #fff; border: 1px solid var(--line); border-radius: 16px;
-    padding: 36px; display: grid; grid-template-columns: 1fr 1fr;
+    padding: 36px; display: grid; grid-template-columns: 2.3fr 1fr;
     gap: 32px; transition: transform .3s var(--ease), box-shadow .3s;
   }
   .play-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(9,59,95,.08); }
@@ -378,7 +379,7 @@
 <header class="hero">
   <div class="wrap">
     <div class="label">Event-Driven Agentic AI</div>
-    <h1>SAP Joule<br><span>+</span> SAP Advanced Event Mesh</h1>
+    <h1>SAP Joule<br><span class="nowrap"><span>+</span> SAP Advanced Event Mesh</span></h1>
     <p class="sub">A reusable pattern and eleven ready-to-run plays. AI agents that react to business events in real time, not overnight batches.</p>
 
     <div class="hero-flow">

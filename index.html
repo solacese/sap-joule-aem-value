@@ -338,6 +338,80 @@
   footer .foot-links a:hover { text-decoration: underline; }
   footer .foot-src { margin-top: 16px; font-size: 13px; color: rgba(255,255,255,.35); }
 
+  /* ─── MISSION SECTION ─── */
+  .mission-section { background: var(--paper); }
+  .mission-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 4px 24px rgba(9,59,95,.06);
+  }
+  .mission-header {
+    background: linear-gradient(135deg, #0070f2 0%, #0053b8 100%);
+    padding: 32px 36px; color: #fff; position: relative;
+  }
+  .mission-header .mission-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.15); border-radius: 6px;
+    padding: 6px 12px; font-size: 13px; font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .mission-header .mission-badge svg { width: 16px; height: 16px; fill: #ffc933; }
+  .mission-header h3 { font-size: 26px; color: #fff; font-weight: 700; margin-bottom: 8px; }
+  .mission-header .mission-meta {
+    font-size: 14px; color: rgba(255,255,255,.75);
+    display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px;
+  }
+  .mission-header .mission-meta span { display: flex; align-items: center; gap: 6px; }
+  .mission-header .mission-meta svg { width: 16px; height: 16px; fill: rgba(255,255,255,.7); }
+  .mission-body { padding: 36px; }
+  .mission-body h4 {
+    font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; margin-top: 24px;
+  }
+  .mission-body h4:first-child { margin-top: 0; }
+  .mission-body p { font-size: 16px; color: var(--body); max-width: none; }
+  .mission-body .mission-tags {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+  }
+  .mission-body .mission-tags span {
+    font-size: 13px; font-weight: 500; color: #0070f2;
+    background: #e8f1fd; border-radius: 6px; padding: 6px 12px;
+  }
+  .mission-phases {
+    margin-top: 28px; border-top: 1px solid var(--line); padding-top: 28px;
+  }
+  .mission-phases h4 { margin-top: 0; margin-bottom: 20px; }
+  .phase-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  @media(max-width:840px) { .phase-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width:520px) { .phase-grid { grid-template-columns: 1fr; } }
+  .phase-item {
+    background: var(--soft); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px; position: relative; text-align: center;
+  }
+  .phase-item .phase-num {
+    width: 28px; height: 28px; background: #0070f2; color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; margin: 0 auto 10px;
+  }
+  .phase-item .phase-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .phase-item .phase-desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .mission-prereqs {
+    margin-top: 28px; border-top: 1px solid var(--line); padding-top: 28px;
+  }
+  .mission-prereqs h4 { margin-top: 0; }
+  .prereq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  @media(max-width:760px) { .prereq-grid { grid-template-columns: 1fr; } }
+  .prereq-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--soft); border-radius: 8px; padding: 12px 16px;
+  }
+  .prereq-item .prereq-icon {
+    width: 36px; height: 36px; background: #e8f1fd; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .prereq-item .prereq-icon svg { width: 18px; height: 18px; fill: #0070f2; }
+  .prereq-item .prereq-text { font-size: 14px; color: var(--body); }
+  .prereq-item .prereq-text strong { color: var(--ink); }
+
   /* ─── BACK TO TOP ─── */
   .back-to-top {
     position: fixed; bottom: 28px; right: 28px;
@@ -371,6 +445,7 @@
       <a href="#pattern">Pattern</a>
       <a href="#plays">Plays</a>
       <a href="#start">Where to Start</a>
+      <a href="#mission">Mission</a>
     </div>
   </div>
 </nav>
@@ -486,6 +561,106 @@
           <li>Real-time treasury &amp; liquidity <strong>(04)</strong></li>
         </ul>
         <div class="start-note">Touches revenue, continuity, and cash. Board-level outcomes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section id="mission" class="mission-section">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">SAP Discovery Center Mission</div>
+      <h2 class="sec-title">Get Started with Event-Driven Agentic AI</h2>
+      <p class="sec-desc">A step-by-step mission to implement the Joule + Advanced Event Mesh pattern in your SAP landscape.</p>
+    </div>
+
+    <div class="mission-card reveal">
+      <div class="mission-header">
+        <div class="mission-badge">
+          <svg viewBox="0 0 16 16"><path d="M8 0L10.2 5.4 16 6.2 11.8 10.1 12.9 16 8 13.1 3.1 16 4.2 10.1 0 6.2 5.8 5.4z"/></svg>
+          Featured Mission
+        </div>
+        <h3>Implement Event-Driven Agentic AI with SAP Joule and SAP Advanced Event Mesh</h3>
+        <div class="mission-meta">
+          <span><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M8 4v4.5l3 1.5" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round"/></svg> Duration: 2–4 weeks</span>
+          <span><svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM5.5 11c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5"/></svg> Experience Level: Intermediate</span>
+          <span><svg viewBox="0 0 16 16"><path d="M2 2h12v12H2z" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><path d="M5 0v4M11 0v4M2 6h12" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round"/></svg> Updated: 2025</span>
+        </div>
+      </div>
+
+      <div class="mission-body">
+        <h4>Current Position: What is the challenge?</h4>
+        <p>Your SAP landscape processes business events in batch cycles. Orders wait hours to be triaged. Maintenance is reactive. Invoices sit in exception queues. AI agents exist but lack real-time context and governed connectivity to production systems.</p>
+
+        <h4>Destination: What is the outcome?</h4>
+        <p>A production-grade, event-driven agentic AI pattern where SAP Joule agents subscribe to real-time business events from SAP S/4HANA, reason over live data from across your landscape (SAP IBP, SAP TM, SAP Ariba, SAP SuccessFactors), and publish governed, throttled transactions back through SAP Advanced Event Mesh. One reusable pattern, eleven ready-to-run plays.</p>
+
+        <div class="mission-tags">
+          <span>SAP S/4HANA</span>
+          <span>SAP Joule</span>
+          <span>SAP Advanced Event Mesh</span>
+          <span>SAP Integration Suite</span>
+          <span>SAP BTP</span>
+          <span>SAP Ariba</span>
+          <span>SAP SuccessFactors</span>
+          <span>SAP IBP</span>
+          <span>Event-Driven Architecture</span>
+          <span>Agentic AI</span>
+        </div>
+
+        <div class="mission-phases">
+          <h4>Mission Phases</h4>
+          <div class="phase-grid">
+            <div class="phase-item">
+              <div class="phase-num">1</div>
+              <div class="phase-title">Discover</div>
+              <div class="phase-desc">Understand the pattern and select your first play</div>
+            </div>
+            <div class="phase-item">
+              <div class="phase-num">2</div>
+              <div class="phase-title">Prepare</div>
+              <div class="phase-desc">Provision SAP AEM broker and configure topic taxonomy</div>
+            </div>
+            <div class="phase-item">
+              <div class="phase-num">3</div>
+              <div class="phase-title">Connect</div>
+              <div class="phase-desc">Enable S/4HANA business events and Joule agent subscriptions</div>
+            </div>
+            <div class="phase-item">
+              <div class="phase-num">4</div>
+              <div class="phase-title">Implement</div>
+              <div class="phase-desc">Build the Trigger, Reason, Act loop for your chosen play</div>
+            </div>
+            <div class="phase-item">
+              <div class="phase-num">5</div>
+              <div class="phase-title">Govern</div>
+              <div class="phase-desc">Apply ACLs, rate limits, schema validation, and monitoring</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mission-prereqs">
+          <h4>Prerequisites</h4>
+          <div class="prereq-grid">
+            <div class="prereq-item">
+              <div class="prereq-icon"><svg viewBox="0 0 16 16"><path d="M2 3h12v10H2z" fill="none" stroke="#0070f2" stroke-width="1.5"/><path d="M5 1v4M11 1v4" fill="none" stroke="#0070f2" stroke-width="1.5"/></svg></div>
+              <div class="prereq-text"><strong>SAP BTP account</strong> with SAP Integration Suite entitlement</div>
+            </div>
+            <div class="prereq-item">
+              <div class="prereq-icon"><svg viewBox="0 0 16 16"><path d="M8 1L1 5v6l7 4 7-4V5z" fill="none" stroke="#0070f2" stroke-width="1.5"/></svg></div>
+              <div class="prereq-text"><strong>SAP S/4HANA Cloud</strong> or on-premise 2023+ with business events enabled</div>
+            </div>
+            <div class="prereq-item">
+              <div class="prereq-icon"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#0070f2" stroke-width="1.5"/><path d="M8 5v3l2 2" fill="none" stroke="#0070f2" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+              <div class="prereq-text"><strong>SAP Advanced Event Mesh</strong> service instance provisioned</div>
+            </div>
+            <div class="prereq-item">
+              <div class="prereq-icon"><svg viewBox="0 0 16 16"><path d="M4 8a4 4 0 118 0 4 4 0 01-8 0z" fill="none" stroke="#0070f2" stroke-width="1.5"/><path d="M8 6v4M6 8h4" fill="none" stroke="#0070f2" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+              <div class="prereq-text"><strong>SAP Joule</strong> activated in your SAP AI landscape</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

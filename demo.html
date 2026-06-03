@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Joule + AEM | Agent Builder Demo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --deep:#093B5F;--accent:#00C895;--dark:#03213B;
+  --ink:#1a2b36;--body:#3d4f5f;--muted:#6b7f8e;
+  --paper:#ffffff;--soft:#f7f8fa;--line:#e5e9ed;
+  --blue:#0070f2;--font:'Inter',system-ui,sans-serif;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);font-size:16px;line-height:1.6;color:var(--body);background:var(--soft);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+/* Container */
+.app{max-width:720px;width:100%;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(9,59,95,.08);overflow:hidden;position:relative}
+.app-header{background:linear-gradient(135deg,var(--deep),var(--dark));padding:28px 36px;color:#fff}
+.app-header h1{font-size:20px;font-weight:700;letter-spacing:-0.01em}
+.app-header h1 span{color:var(--accent)}
+.app-header p{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px}
+
+/* Progress */
+.progress{display:flex;gap:4px;padding:20px 36px 0;background:#fff}
+.progress .dot{flex:1;height:4px;border-radius:2px;background:var(--line);transition:background .4s var(--ease)}
+.progress .dot.active{background:var(--accent)}
+.progress .dot.done{background:var(--deep)}
+
+/* Steps */
+.step{display:none;padding:36px;animation:fadeIn .4s var(--ease)}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.step-label{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.step h2{font-size:24px;font-weight:700;color:var(--ink);margin-bottom:20px;letter-spacing:-0.02em}
+.step p.desc{font-size:15px;color:var(--muted);margin-bottom:24px}
+
+/* Form */
+input[type="text"]{width:100%;font-family:var(--font);font-size:16px;padding:14px 18px;border:1px solid var(--line);border-radius:10px;outline:none;transition:border-color .2s}
+input[type="text"]:focus{border-color:var(--accent)}
+
+/* Selection grid */
+.sel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.sel-grid{grid-template-columns:1fr}}
+.sel-item{padding:16px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:all .2s var(--ease);position:relative}
+.sel-item:hover{border-color:var(--accent);background:rgba(0,200,149,.03);transform:translateY(-1px)}
+.sel-item.selected{border-color:var(--accent);background:rgba(0,200,149,.06);box-shadow:0 0 0 2px rgba(0,200,149,.2)}
+.sel-item .sel-title{font-size:15px;font-weight:600;color:var(--ink)}
+.sel-item .sel-desc{font-size:13px;color:var(--muted);margin-top:3px}
+.sel-item .sel-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;color:var(--accent);background:rgba(0,200,149,.1);padding:3px 8px;border-radius:4px}
+
+/* Event list */
+.event-list{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:8px}
+.event-item{padding:14px 16px;border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:all .2s var(--ease);display:flex;justify-content:space-between;align-items:center}
+.event-item:hover{border-color:var(--accent);background:rgba(0,200,149,.03)}
+.event-item.selected{border-color:var(--accent);background:rgba(0,200,149,.06);box-shadow:0 0 0 2px rgba(0,200,149,.2)}
+.event-item .ev-name{font-size:14px;font-weight:600;color:var(--ink)}
+.event-item .ev-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.event-item .ev-freq{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+
+/* Agent card */
+.agent-card{border:1px solid var(--line);border-radius:14px;padding:24px;cursor:pointer;transition:all .2s var(--ease)}
+.agent-card:hover{border-color:var(--blue);background:rgba(0,112,242,.02)}
+.agent-card.selected{border-color:var(--blue);background:rgba(0,112,242,.04);box-shadow:0 0 0 2px rgba(0,112,242,.15)}
+.agent-card .ag-badge{font-size:11px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:5px;display:inline-block;margin-bottom:10px}
+.agent-card h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.agent-card p{font-size:14px;color:var(--body);margin-bottom:12px}
+.agent-card .ag-caps{display:flex;flex-wrap:wrap;gap:6px}
+.agent-card .ag-caps span{font-size:11px;font-weight:500;color:var(--deep);background:var(--soft);border:1px solid var(--line);padding:4px 10px;border-radius:5px}
+.agents-grid{display:flex;flex-direction:column;gap:12px}
+
+/* Benefits */
+.benefits-content{font-size:15px;color:var(--body);line-height:1.7}
+.benefits-content h3{font-size:18px;font-weight:700;color:var(--ink);margin:20px 0 8px}
+.benefits-content h3:first-child{margin-top:0}
+.benefits-content ul{padding-left:20px;margin:8px 0}
+.benefits-content li{margin:4px 0}
+.benefits-content strong{color:var(--ink)}
+.benefits-content .highlight{background:linear-gradient(135deg,var(--deep),var(--dark));color:#fff;border-radius:12px;padding:20px 24px;margin:20px 0}
+.benefits-content .highlight h3{color:var(--accent);margin-top:0}
+.benefits-content .highlight p,.benefits-content .highlight li{color:rgba(255,255,255,.85)}
+.benefits-content .highlight strong{color:#fff}
+
+/* Loading */
+.loading{display:flex;align-items:center;gap:12px;padding:24px;color:var(--muted);font-size:14px}
+.loading .spinner{width:20px;height:20px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Buttons */
+.btn-row{display:flex;gap:10px;margin-top:28px}
+.btn{font-family:var(--font);font-size:15px;font-weight:600;padding:12px 24px;border-radius:10px;cursor:pointer;border:none;transition:all .2s var(--ease)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#00b587;transform:translateY(-1px)}
+.btn-primary:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;transform:none}
+.btn-secondary{background:#fff;color:var(--body);border:1px solid var(--line)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--deep)}
+.btn-restart{background:var(--deep);color:#fff}
+.btn-restart:hover{background:var(--dark)}
+
+/* Summary bar */
+.summary-bar{background:var(--soft);border-top:1px solid var(--line);padding:14px 36px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
+.summary-bar span{color:var(--ink);font-weight:600}
+
+/* Responsive */
+@media(max-width:520px){
+  body{padding:12px}
+  .app-header{padding:20px 24px}
+  .step{padding:24px}
+  .progress{padding:16px 24px 0}
+  .summary-bar{padding:12px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="app-header">
+    <h1>Joule <span>+</span> Advanced Event Mesh</h1>
+    <p>Build your real-time AI agent scenario</p>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <!-- Step 1: Company Name -->
+  <div class="step active" id="step-1">
+    <div class="step-label">Step 1 of 6</div>
+    <h2>Your organization</h2>
+    <input type="text" id="companyName" placeholder="Enter your company name" autocomplete="organization">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="nextStep()" id="btn-1">Continue</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Select SAP System -->
+  <div class="step" id="step-2">
+    <div class="step-label">Step 2 of 6</div>
+    <h2>Which SAP system emits your events?</h2>
+    <div class="sel-grid" id="systemGrid"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" onclick="nextStep()" id="btn-2" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Select Trigger Event -->
+  <div class="step" id="step-3">
+    <div class="step-label">Step 3 of 6</div>
+    <h2>Pick a trigger event</h2>
+    <p class="desc">Top events emitted by <span id="selectedSystemName"></span></p>
+    <div class="event-list" id="eventList"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" onclick="nextStep()" id="btn-3" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Proposed Agent -->
+  <div class="step" id="step-4">
+    <div class="step-label">Step 4 of 6</div>
+    <h2>Recommended Joule agent</h2>
+    <p class="desc">Based on your trigger event, these agents can handle this scenario.</p>
+    <div class="agents-grid" id="agentGrid"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" onclick="nextStep()" id="btn-4" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Output Events -->
+  <div class="step" id="step-5">
+    <div class="step-label">Step 5 of 6</div>
+    <h2>Actions the agent can take</h2>
+    <p class="desc">Events the agent would publish back onto Advanced Event Mesh.</p>
+    <div class="event-list" id="outputList"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" onclick="nextStep()" id="btn-5" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- Step 6: Benefits -->
+  <div class="step" id="step-6">
+    <div class="step-label">Step 6 of 6</div>
+    <h2>Business impact for <span id="companyDisplay"></span></h2>
+    <div id="benefitsArea">
+      <div class="loading"><div class="spinner"></div>Generating personalized benefits analysis...</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+      <button class="btn btn-restart" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+  <div class="summary-bar" id="summaryBar" style="display:none"></div>
+</div>
+
+<script>
+// ─── DATA ───
+const SYSTEMS = [
+  {id:"s4hana", name:"SAP S/4HANA Cloud", desc:"Core ERP: finance, logistics, procurement"},
+  {id:"s4op", name:"SAP S/4HANA On-Premise", desc:"On-premise ERP with event enablement"},
+  {id:"ecc", name:"SAP ECC", desc:"Classic R/3 / ECC via AIF or middleware"},
+  {id:"sf", name:"SAP SuccessFactors", desc:"HCM: hiring, payroll, talent, time"},
+  {id:"ariba", name:"SAP Ariba", desc:"Procurement network and sourcing"},
+  {id:"ibp", name:"SAP IBP", desc:"Integrated Business Planning and supply chain"},
+  {id:"concur", name:"SAP Concur", desc:"Travel and expense management"},
+  {id:"fsm", name:"SAP Field Service Management", desc:"Work orders, technicians, scheduling"}
+];
+
+const EVENTS = {
+  s4hana: [
+    {id:"so_created", name:"SalesOrder.Created", desc:"New sales order is booked", freq:"~2,400/day"},
+    {id:"so_changed", name:"SalesOrder.Changed", desc:"Sales order is modified", freq:"~4,100/day"},
+    {id:"po_created", name:"PurchaseOrder.Created", desc:"New purchase order raised", freq:"~1,800/day"},
+    {id:"po_changed", name:"PurchaseOrder.Changed", desc:"Purchase order modified or confirmed", freq:"~3,200/day"},
+    {id:"inv_created", name:"SupplierInvoice.Created", desc:"Supplier invoice posted for matching", freq:"~1,200/day"},
+    {id:"gr_posted", name:"GoodsReceipt.Posted", desc:"Goods received against a PO", freq:"~2,000/day"},
+    {id:"gi_posted", name:"GoodsIssue.Posted", desc:"Goods issued for delivery or production", freq:"~1,600/day"},
+    {id:"je_posted", name:"JournalEntry.Posted", desc:"Financial journal entry posted", freq:"~8,500/day"},
+    {id:"bp_changed", name:"BusinessPartner.Changed", desc:"Customer or vendor master data updated", freq:"~600/day"},
+    {id:"del_created", name:"OutboundDelivery.Created", desc:"Delivery document created for shipment", freq:"~1,400/day"},
+    {id:"del_gi", name:"OutboundDelivery.GoodsIssued", desc:"Shipment left the warehouse", freq:"~1,300/day"},
+    {id:"mat_changed", name:"Material.Changed", desc:"Material master record updated", freq:"~900/day"},
+    {id:"pay_exec", name:"PaymentRun.Executed", desc:"Automated payment batch completed", freq:"~120/day"},
+    {id:"maint_req", name:"MaintenanceOrder.Requested", desc:"PM work order requested", freq:"~340/day"},
+    {id:"prodord", name:"ProductionOrder.Released", desc:"Manufacturing order released to shop floor", freq:"~780/day"},
+    {id:"billing_created", name:"BillingDocument.Created", desc:"Invoice or credit memo created", freq:"~2,100/day"},
+    {id:"atp_short", name:"ATP.Shortfall", desc:"Available-to-promise check failed", freq:"~280/day"},
+    {id:"cred_block", name:"CreditBlock.Triggered", desc:"Order blocked due to credit limit", freq:"~150/day"},
+    {id:"contract_exp", name:"Contract.Expiring", desc:"Customer or vendor contract nearing end", freq:"~45/day"},
+    {id:"cost_overrun", name:"CostCenter.BudgetExceeded", desc:"Cost center exceeded planned budget", freq:"~60/day"}
+  ],
+  s4op: [
+    {id:"so_created", name:"SalesOrder.Created", desc:"New sales order is booked", freq:"~2,400/day"},
+    {id:"so_changed", name:"SalesOrder.Changed", desc:"Sales order is modified", freq:"~4,100/day"},
+    {id:"po_created", name:"PurchaseOrder.Created", desc:"New purchase order raised", freq:"~1,800/day"},
+    {id:"po_changed", name:"PurchaseOrder.Changed", desc:"Purchase order modified", freq:"~3,200/day"},
+    {id:"inv_created", name:"SupplierInvoice.Created", desc:"Supplier invoice posted", freq:"~1,200/day"},
+    {id:"gr_posted", name:"GoodsReceipt.Posted", desc:"Goods received against a PO", freq:"~2,000/day"},
+    {id:"gi_posted", name:"GoodsIssue.Posted", desc:"Goods issued for delivery", freq:"~1,600/day"},
+    {id:"je_posted", name:"JournalEntry.Posted", desc:"Financial posting created", freq:"~8,500/day"},
+    {id:"bp_changed", name:"BusinessPartner.Changed", desc:"Master data updated", freq:"~600/day"},
+    {id:"del_created", name:"OutboundDelivery.Created", desc:"Delivery created for shipment", freq:"~1,400/day"},
+    {id:"idoc_fail", name:"IDoc.Failed", desc:"Interface document processing failed", freq:"~200/day"},
+    {id:"mat_changed", name:"Material.Changed", desc:"Material master updated", freq:"~900/day"},
+    {id:"maint_req", name:"MaintenanceOrder.Requested", desc:"PM work order created", freq:"~340/day"},
+    {id:"prodord", name:"ProductionOrder.Released", desc:"Order released to production", freq:"~780/day"},
+    {id:"pay_exec", name:"PaymentRun.Executed", desc:"Payment batch completed", freq:"~120/day"}
+  ],
+  ecc: [
+    {id:"so_created", name:"BAPI_SALESORDER.Created", desc:"Sales order via BAPI", freq:"~1,800/day"},
+    {id:"po_created", name:"BAPI_PO.Created", desc:"Purchase order via BAPI", freq:"~1,200/day"},
+    {id:"inv_created", name:"INVOICE_RECEIPT.Posted", desc:"Invoice receipt document", freq:"~900/day"},
+    {id:"gr_posted", name:"GOODS_MOVEMENT.101", desc:"Goods receipt movement type 101", freq:"~1,500/day"},
+    {id:"idoc_fail", name:"IDOC.StatusError", desc:"IDoc stuck in error status", freq:"~350/day"},
+    {id:"mat_changed", name:"MATERIAL_MASTER.Changed", desc:"Material master change via MM02", freq:"~700/day"},
+    {id:"bp_changed", name:"VENDOR_MASTER.Changed", desc:"Vendor master data changed", freq:"~200/day"},
+    {id:"je_posted", name:"FI_DOCUMENT.Posted", desc:"FI document posted", freq:"~6,000/day"},
+    {id:"del_gi", name:"DELIVERY.GoodsIssue", desc:"Delivery goods issue posted", freq:"~1,100/day"},
+    {id:"pay_exec", name:"PAYMENT_RUN.Completed", desc:"F110 payment run completed", freq:"~80/day"}
+  ],
+  sf: [
+    {id:"emp_hired", name:"Employee.Hired", desc:"New employee onboarded", freq:"~45/day"},
+    {id:"emp_terminated", name:"Employee.Terminated", desc:"Employee offboarded", freq:"~20/day"},
+    {id:"emp_transferred", name:"Employee.Transferred", desc:"Employee moved to new org unit", freq:"~30/day"},
+    {id:"comp_changed", name:"Compensation.Changed", desc:"Salary or bonus updated", freq:"~80/day"},
+    {id:"perf_completed", name:"PerformanceReview.Completed", desc:"Annual review submitted", freq:"~60/day"},
+    {id:"goal_updated", name:"Goal.Updated", desc:"Employee goal modified", freq:"~120/day"},
+    {id:"leave_req", name:"LeaveRequest.Submitted", desc:"Time-off request submitted", freq:"~400/day"},
+    {id:"shift_gap", name:"ShiftSchedule.GapDetected", desc:"Unfilled shift identified", freq:"~35/day"},
+    {id:"training_due", name:"Training.Overdue", desc:"Mandatory training past due date", freq:"~90/day"},
+    {id:"position_open", name:"Position.Opened", desc:"New requisition opened", freq:"~25/day"},
+    {id:"payroll_err", name:"Payroll.ErrorDetected", desc:"Payroll calculation exception", freq:"~15/day"},
+    {id:"cert_expiring", name:"Certification.Expiring", desc:"Employee certification nearing expiry", freq:"~40/day"}
+  ],
+  ariba: [
+    {id:"req_created", name:"Requisition.Created", desc:"Purchase requisition submitted", freq:"~600/day"},
+    {id:"req_approved", name:"Requisition.Approved", desc:"Requisition approved for sourcing", freq:"~500/day"},
+    {id:"rfx_published", name:"RFx.Published", desc:"Sourcing event published to suppliers", freq:"~30/day"},
+    {id:"contract_exp", name:"Contract.Expiring", desc:"Supplier contract nearing renewal", freq:"~20/day"},
+    {id:"supplier_risk", name:"SupplierRisk.Changed", desc:"Supplier risk score updated", freq:"~50/day"},
+    {id:"inv_exception", name:"Invoice.ExceptionRaised", desc:"Invoice failed matching rules", freq:"~180/day"},
+    {id:"catalog_update", name:"Catalog.Updated", desc:"Supplier catalog prices changed", freq:"~40/day"},
+    {id:"po_confirmed", name:"PurchaseOrder.Confirmed", desc:"Supplier confirmed the PO", freq:"~800/day"},
+    {id:"spend_anomaly", name:"Spend.AnomalyDetected", desc:"Unusual spending pattern flagged", freq:"~12/day"},
+    {id:"supplier_qual", name:"Supplier.QualificationExpired", desc:"Supplier qualification lapsed", freq:"~8/day"}
+  ],
+  ibp: [
+    {id:"demand_change", name:"DemandForecast.Changed", desc:"Statistical forecast revised", freq:"~500/day"},
+    {id:"supply_short", name:"SupplyPlan.Shortfall", desc:"Supply cannot meet demand", freq:"~120/day"},
+    {id:"inv_excess", name:"Inventory.ExcessDetected", desc:"Stock exceeds target levels", freq:"~80/day"},
+    {id:"leadtime_change", name:"LeadTime.Changed", desc:"Supplier lead time updated", freq:"~60/day"},
+    {id:"plan_released", name:"Plan.Released", desc:"Consensus plan released to execution", freq:"~5/day"},
+    {id:"exception_alert", name:"PlanningException.Raised", desc:"Planner alert triggered", freq:"~200/day"},
+    {id:"alloc_change", name:"Allocation.Changed", desc:"Product allocation adjusted", freq:"~40/day"},
+    {id:"snp_run", name:"SNP.RunCompleted", desc:"Supply network planning run finished", freq:"~8/day"}
+  ],
+  concur: [
+    {id:"expense_sub", name:"ExpenseReport.Submitted", desc:"Employee submitted expenses", freq:"~800/day"},
+    {id:"expense_app", name:"ExpenseReport.Approved", desc:"Manager approved expense report", freq:"~700/day"},
+    {id:"policy_viol", name:"PolicyViolation.Detected", desc:"Expense violates company policy", freq:"~120/day"},
+    {id:"trip_booked", name:"TravelBooking.Created", desc:"Travel itinerary booked", freq:"~300/day"},
+    {id:"receipt_missing", name:"Receipt.Missing", desc:"Required receipt not attached", freq:"~200/day"},
+    {id:"budget_exceeded", name:"TravelBudget.Exceeded", desc:"Trip cost exceeds approved budget", freq:"~45/day"},
+    {id:"duplicate_exp", name:"Expense.DuplicateDetected", desc:"Possible duplicate submission", freq:"~30/day"},
+    {id:"card_trans", name:"CorporateCard.Transaction", desc:"New corporate card charge", freq:"~2,000/day"}
+  ],
+  fsm: [
+    {id:"wo_created", name:"WorkOrder.Created", desc:"New work order raised", freq:"~400/day"},
+    {id:"wo_assigned", name:"WorkOrder.Assigned", desc:"Technician assigned to job", freq:"~380/day"},
+    {id:"wo_completed", name:"WorkOrder.Completed", desc:"Field work marked done", freq:"~350/day"},
+    {id:"sla_breach", name:"SLA.BreachRisk", desc:"Service level at risk of breach", freq:"~40/day"},
+    {id:"tech_available", name:"Technician.Available", desc:"Technician became available", freq:"~250/day"},
+    {id:"parts_needed", name:"Parts.Required", desc:"Spare part needed for job", freq:"~180/day"},
+    {id:"customer_nps", name:"Customer.FeedbackReceived", desc:"Post-service survey returned", freq:"~200/day"},
+    {id:"schedule_conflict", name:"Schedule.Conflict", desc:"Double-booking or overlap detected", freq:"~25/day"}
+  ]
+};
+
+const AGENTS = {
+  so_created: [{name:"Sales Order Processing Agent", badge:"SAP S/4HANA", desc:"Validates orders, checks ATP, resolves fulfillment exceptions automatically.", caps:["ATP check","Substitute products","Partial fulfillment","Credit validation"]},
+               {name:"Revenue Optimization Agent", badge:"SAP Analytics", desc:"Analyzes order patterns and suggests upsell or cross-sell opportunities.", caps:["Customer segmentation","Price optimization","Bundle recommendations"]}],
+  so_changed: [{name:"Order Change Management Agent", badge:"SAP S/4HANA", desc:"Evaluates order changes for supply chain and delivery impact.", caps:["Impact assessment","Schedule adjustment","Customer notification","Delivery replanning"]}],
+  po_created: [{name:"Procurement Compliance Agent", badge:"SAP Ariba", desc:"Validates purchase orders against contracts, budgets, and supplier risk.", caps:["Contract matching","Budget check","Supplier risk scoring","Approval routing"]},
+               {name:"Spend Intelligence Agent", badge:"SAP Ariba", desc:"Detects maverick spend and suggests preferred suppliers.", caps:["Spend classification","Supplier benchmarking","Savings identification"]}],
+  po_changed: [{name:"Supply Continuity Agent", badge:"SAP IBP", desc:"Assesses PO changes for production impact and triggers replanning.", caps:["Production impact analysis","Buffer stock check","Alternate sourcing","Expedite decisions"]}],
+  inv_created: [{name:"Invoice Processing Agent", badge:"SAP S/4HANA AP", desc:"Automates 3-way match, resolves exceptions, routes for approval.", caps:["3-way match","Tolerance check","Exception resolution","Auto-posting"]},
+                {name:"Fraud Detection Agent", badge:"SAP Business Integrity", desc:"Scores invoices for duplicate or fraudulent patterns.", caps:["Duplicate detection","Bank detail change alerts","Anomaly scoring","Case creation"]}],
+  gr_posted: [{name:"Quality Inspection Agent", badge:"SAP QM", desc:"Triggers quality checks and routes non-conformances.", caps:["Inspection lot creation","Sampling rules","Non-conformance routing","Supplier scorecards"]}],
+  gi_posted: [{name:"Logistics Optimization Agent", badge:"SAP TM", desc:"Optimizes shipment consolidation and carrier selection.", caps:["Load optimization","Carrier selection","Route planning","Cost comparison"]}],
+  je_posted: [{name:"Financial Controls Agent", badge:"SAP S/4HANA FI", desc:"Monitors postings for anomalies and compliance issues.", caps:["Segregation of duties","Threshold monitoring","Reconciliation","Audit flagging"]}],
+  bp_changed: [{name:"Master Data Governance Agent", badge:"SAP MDG", desc:"Validates master data changes and checks for data quality.", caps:["Duplicate detection","Completeness check","Cross-reference validation","Change approval"]}],
+  del_created: [{name:"Delivery Orchestration Agent", badge:"SAP TM", desc:"Coordinates picking, packing, and carrier assignment.", caps:["Wave planning","Resource allocation","Carrier assignment","SLA tracking"]}],
+  del_gi: [{name:"Customer Communication Agent", badge:"SAP Emarsys", desc:"Sends proactive shipping notifications and ETA updates.", caps:["ETA calculation","Proactive alerts","Delay notification","Tracking links"]}],
+  mat_changed: [{name:"Material Lifecycle Agent", badge:"SAP PLM", desc:"Validates material changes for downstream impact.", caps:["BOM impact analysis","Procurement alert","Phase-in/out planning","Documentation update"]}],
+  pay_exec: [{name:"Treasury Management Agent", badge:"SAP Treasury", desc:"Optimizes payment timing and manages cash position.", caps:["Cash forecasting","Early-pay discounts","FX optimization","Liquidity planning"]}],
+  maint_req: [{name:"Predictive Maintenance Agent", badge:"SAP Asset Mgmt", desc:"Assesses maintenance urgency and schedules optimal timing.", caps:["Severity scoring","Parts availability","Technician matching","Downtime minimization"]}],
+  prodord: [{name:"Production Scheduling Agent", badge:"SAP PP/DS", desc:"Optimizes production sequence and resource utilization.", caps:["Sequence optimization","Capacity leveling","Material availability","Lead time compression"]}],
+  billing_created: [{name:"Revenue Recognition Agent", badge:"SAP RAR", desc:"Ensures correct revenue allocation and compliance.", caps:["IFRS 15 compliance","Performance obligation split","Deferred revenue","Period allocation"]}],
+  atp_short: [{name:"Fulfillment Resolution Agent", badge:"SAP S/4HANA", desc:"Finds alternatives when stock is insufficient.", caps:["Alternate plant check","Substitute SKU","Partial delivery","Customer notification"]}],
+  cred_block: [{name:"Credit Management Agent", badge:"SAP S/4HANA FI", desc:"Evaluates blocked orders and proposes resolution.", caps:["Payment history analysis","Risk re-scoring","Partial release","Escalation routing"]}],
+  contract_exp: [{name:"Contract Renewal Agent", badge:"SAP Ariba", desc:"Prepares renewal recommendations before expiry.", caps:["Performance review","Market benchmarking","Renewal proposal","Stakeholder notification"]}],
+  cost_overrun: [{name:"Budget Control Agent", badge:"SAP Controlling", desc:"Investigates overruns and recommends corrective actions.", caps:["Variance analysis","Reforecast proposal","Transfer budget","Approval workflow"]}],
+  emp_hired: [{name:"Onboarding Orchestration Agent", badge:"SAP SuccessFactors", desc:"Coordinates cross-system provisioning for new hires.", caps:["IT provisioning","Badge creation","Training enrollment","Manager notification"]}],
+  emp_terminated: [{name:"Offboarding Agent", badge:"SAP SuccessFactors", desc:"Ensures complete offboarding across all systems.", caps:["Access revocation","Equipment return","Final pay calculation","Knowledge transfer"]}],
+  emp_transferred: [{name:"Organization Change Agent", badge:"SAP SuccessFactors", desc:"Updates reporting, cost centers, and access for transfers.", caps:["Reporting update","Cost center change","Access adjustment","Notification cascade"]}],
+  comp_changed: [{name:"Compensation Analysis Agent", badge:"SAP SuccessFactors", desc:"Validates compensation changes against policy and budget.", caps:["Band compliance","Budget impact","Equity analysis","Approval routing"]}],
+  perf_completed: [{name:"Talent Development Agent", badge:"SAP SuccessFactors", desc:"Recommends development plans based on review outcomes.", caps:["Skill gap analysis","Training recommendations","Succession planning","Goal setting"]}],
+  leave_req: [{name:"Workforce Planning Agent", badge:"SAP SuccessFactors", desc:"Checks coverage and proposes backfill when needed.", caps:["Coverage check","Shift rebalancing","Approval routing","Calendar sync"]}],
+  shift_gap: [{name:"Shift Fulfillment Agent", badge:"SAP SuccessFactors", desc:"Finds and proposes available qualified workers for gaps.", caps:["Skill matching","Availability check","Overtime rules","Worker notification"]}],
+  training_due: [{name:"Compliance Training Agent", badge:"SAP SuccessFactors LMS", desc:"Escalates overdue training and blocks non-compliant assignments.", caps:["Reminder cascade","Manager escalation","Assignment blocking","Compliance reporting"]}],
+  req_created: [{name:"Source-to-Pay Agent", badge:"SAP Ariba", desc:"Finds optimal sourcing path for new requisitions.", caps:["Catalog matching","Contract leveraging","Supplier selection","Price benchmarking"]}],
+  supplier_risk: [{name:"Supplier Risk Agent", badge:"SAP Ariba", desc:"Evaluates risk changes and recommends mitigation actions.", caps:["Risk scoring","Alternate supplier","Contract review","Stakeholder alert"]}],
+  inv_exception: [{name:"AP Exception Agent", badge:"SAP Ariba", desc:"Investigates and resolves invoice matching failures.", caps:["Root cause analysis","Tolerance check","Auto-correction","Approver routing"]}],
+  demand_change: [{name:"Demand Sensing Agent", badge:"SAP IBP", desc:"Adjusts plans based on real-time demand signals.", caps:["Signal correlation","Forecast adjustment","Safety stock recalc","Alert generation"]}],
+  supply_short: [{name:"Supply Resolution Agent", badge:"SAP IBP", desc:"Proposes actions to close supply gaps.", caps:["Alternate sourcing","Expedite evaluation","Allocation change","Customer prioritization"]}],
+  expense_sub: [{name:"Expense Audit Agent", badge:"SAP Concur", desc:"Validates expenses against policy before approval.", caps:["Policy check","Receipt validation","Duplicate detection","Category correction"]}],
+  policy_viol: [{name:"Compliance Enforcement Agent", badge:"SAP Concur", desc:"Handles policy violations and routes for resolution.", caps:["Violation classification","Auto-rejection","Manager notification","Exception request"]}],
+  wo_created: [{name:"Field Dispatch Agent", badge:"SAP FSM", desc:"Assigns the best technician based on skills, location, and SLA.", caps:["Skill matching","Travel optimization","SLA awareness","Parts pre-staging"]}],
+  sla_breach: [{name:"SLA Protection Agent", badge:"SAP FSM", desc:"Escalates at-risk service requests to prevent breach.", caps:["Priority reboosting","Resource reallocation","Customer communication","Penalty calculation"]}],
+  // Fallback
+  _default: [{name:"General Process Agent", badge:"SAP Joule", desc:"Analyzes the event and proposes next-best actions.", caps:["Event correlation","Impact assessment","Action recommendation","Notification routing"]}]
+};
+
+const OUTPUT_EVENTS = {
+  "Sales Order Processing Agent": [
+    {name:"FulfillmentProposal.Created", desc:"Proposed fulfillment plan for the order"},
+    {name:"SubstituteSKU.Suggested", desc:"Alternative product recommended"},
+    {name:"CustomerNotification.Sent", desc:"Customer informed of order status"},
+    {name:"DeliverySchedule.Adjusted", desc:"Shipping date recalculated"}
+  ],
+  "Order Change Management Agent": [
+    {name:"DeliveryReschedule.Requested", desc:"New delivery date proposed"},
+    {name:"ProductionOrder.Adjusted", desc:"Manufacturing plan updated"},
+    {name:"CustomerAlert.Sent", desc:"Customer notified of change impact"}
+  ],
+  "Procurement Compliance Agent": [
+    {name:"ApprovalRouting.Triggered", desc:"PO sent to correct approver"},
+    {name:"ContractMatch.Confirmed", desc:"PO matched to existing contract"},
+    {name:"BudgetAlert.Raised", desc:"Budget impact flagged for review"}
+  ],
+  "Invoice Processing Agent": [
+    {name:"InvoiceBlock.Released", desc:"Payment block removed after match"},
+    {name:"CorrectionPosting.Created", desc:"Automatic correction posted"},
+    {name:"ExceptionCase.Routed", desc:"Unresolvable exception escalated"}
+  ],
+  "Fraud Detection Agent": [
+    {name:"PaymentHold.Applied", desc:"Suspect payment held before execution"},
+    {name:"FraudCase.Opened", desc:"Investigation case created"},
+    {name:"VendorAlert.Raised", desc:"Vendor flagged for review"}
+  ],
+  "Predictive Maintenance Agent": [
+    {name:"MaintenanceOrder.Created", desc:"Work order raised with parts reservation"},
+    {name:"TechnicianSchedule.Updated", desc:"Technician assigned and scheduled"},
+    {name:"SparePartReservation.Created", desc:"Required parts reserved from warehouse"}
+  ],
+  "Supply Continuity Agent": [
+    {name:"ResequenceRequest.Created", desc:"Production line resequenced"},
+    {name:"ExpediteRequest.Issued", desc:"Rush order placed with supplier"},
+    {name:"BufferStock.Allocated", desc:"Safety stock released to cover gap"}
+  ],
+  "Field Dispatch Agent": [
+    {name:"AssignmentProposal.Created", desc:"Technician assignment recommended"},
+    {name:"PartsOrder.Triggered", desc:"Required parts ordered to site"},
+    {name:"CustomerETA.Published", desc:"Arrival estimate sent to customer"}
+  ],
+  "Customer Communication Agent": [
+    {name:"ETAUpdate.Sent", desc:"Revised delivery estimate sent"},
+    {name:"RerouteCommand.Issued", desc:"Shipment rerouted to alternate carrier"},
+    {name:"CompensationOffer.Created", desc:"Goodwill credit proposed for delay"}
+  ],
+  "Onboarding Orchestration Agent": [
+    {name:"ITProvisioning.Requested", desc:"System accounts and hardware ordered"},
+    {name:"TrainingPlan.Created", desc:"Onboarding curriculum assigned"},
+    {name:"ManagerNotification.Sent", desc:"Hiring manager informed of start date"}
+  ],
+  "Expense Audit Agent": [
+    {name:"ExpenseApproval.Routed", desc:"Clean report fast-tracked for approval"},
+    {name:"PolicyException.Flagged", desc:"Violation identified for review"},
+    {name:"ReceiptReminder.Sent", desc:"Employee prompted for missing receipts"}
+  ],
+  _default: [
+    {name:"ActionProposal.Created", desc:"Recommended next action published"},
+    {name:"StakeholderNotification.Sent", desc:"Relevant parties notified"},
+    {name:"AuditLog.Updated", desc:"Decision recorded for compliance"}
+  ]
+};
+
+// ─── STATE ───
+let currentStep = 1;
+let state = { company:"", system:null, event:null, agent:null, output:null };
+
+// ─── RENDER ───
+function renderProgress() {
+  const el = document.getElementById("progress");
+  el.innerHTML = Array.from({length:6}, (_, i) => {
+    let cls = "dot";
+    if (i + 1 < currentStep) cls += " done";
+    else if (i + 1 === currentStep) cls += " active";
+    return `<div class="${cls}"></div>`;
+  }).join("");
+}
+
+function renderSummary() {
+  const bar = document.getElementById("summaryBar");
+  if (!state.system) { bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  let html = [];
+  if (state.company) html.push(`<span>${state.company}</span>`);
+  if (state.system) html.push(SYSTEMS.find(s=>s.id===state.system).name);
+  if (state.event) html.push(state.event.name);
+  if (state.agent) html.push(state.agent.name);
+  if (state.output) html.push("→ " + state.output.name);
+  bar.innerHTML = html.join(" · ");
+}
+
+function showStep(n) {
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  document.getElementById(`step-${n}`).classList.add("active");
+  currentStep = n;
+  renderProgress();
+  renderSummary();
+}
+
+// ─── STEP LOGIC ───
+function nextStep() {
+  if (currentStep === 1) {
+    state.company = document.getElementById("companyName").value.trim() || "Your Organization";
+    showStep(2);
+    renderSystems();
+  } else if (currentStep === 2) {
+    showStep(3);
+    renderEvents();
+  } else if (currentStep === 3) {
+    showStep(4);
+    renderAgents();
+  } else if (currentStep === 4) {
+    showStep(5);
+    renderOutputs();
+  } else if (currentStep === 5) {
+    showStep(6);
+    document.getElementById("companyDisplay").textContent = state.company;
+    generateBenefits();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) showStep(currentStep - 1);
+}
+
+function restart() {
+  state = { company:"", system:null, event:null, agent:null, output:null };
+  document.getElementById("companyName").value = "";
+  showStep(1);
+}
+
+// Step 2: Systems
+function renderSystems() {
+  const grid = document.getElementById("systemGrid");
+  grid.innerHTML = SYSTEMS.map(s => `
+    <div class="sel-item" data-id="${s.id}" onclick="selectSystem('${s.id}')">
+      <div class="sel-title">${s.name}</div>
+      <div class="sel-desc">${s.desc}</div>
+    </div>`).join("");
+}
+
+function selectSystem(id) {
+  state.system = id;
+  document.querySelectorAll("#systemGrid .sel-item").forEach(el => el.classList.toggle("selected", el.dataset.id === id));
+  document.getElementById("btn-2").disabled = false;
+}
+
+// Step 3: Events
+function renderEvents() {
+  const events = EVENTS[state.system] || [];
+  const sysName = SYSTEMS.find(s=>s.id===state.system).name;
+  document.getElementById("selectedSystemName").textContent = sysName;
+  const list = document.getElementById("eventList");
+  list.innerHTML = events.map(ev => `
+    <div class="event-item" data-id="${ev.id}" onclick="selectEvent('${ev.id}')">
+      <div><div class="ev-name">${ev.name}</div><div class="ev-desc">${ev.desc}</div></div>
+      <div class="ev-freq">${ev.freq}</div>
+    </div>`).join("");
+}
+
+function selectEvent(id) {
+  const events = EVENTS[state.system];
+  state.event = events.find(e => e.id === id);
+  document.querySelectorAll("#eventList .event-item").forEach(el => el.classList.toggle("selected", el.dataset.id === id));
+  document.getElementById("btn-3").disabled = false;
+}
+
+// Step 4: Agents
+function renderAgents() {
+  const agents = AGENTS[state.event.id] || AGENTS._default;
+  const grid = document.getElementById("agentGrid");
+  grid.innerHTML = agents.map((ag, i) => `
+    <div class="agent-card" data-idx="${i}" onclick="selectAgent(${i})">
+      <div class="ag-badge">${ag.badge}</div>
+      <h3>${ag.name}</h3>
+      <p>${ag.desc}</p>
+      <div class="ag-caps">${ag.caps.map(c=>`<span>${c}</span>`).join("")}</div>
+    </div>`).join("");
+}
+
+function selectAgent(idx) {
+  const agents = AGENTS[state.event.id] || AGENTS._default;
+  state.agent = agents[idx];
+  document.querySelectorAll("#agentGrid .agent-card").forEach((el,i) => el.classList.toggle("selected", i === idx));
+  document.getElementById("btn-4").disabled = false;
+}
+
+// Step 5: Output events
+function renderOutputs() {
+  const outputs = OUTPUT_EVENTS[state.agent.name] || OUTPUT_EVENTS._default;
+  const list = document.getElementById("outputList");
+  list.innerHTML = outputs.map((ev, i) => `
+    <div class="event-item" data-idx="${i}" onclick="selectOutput(${i})">
+      <div><div class="ev-name">${ev.name}</div><div class="ev-desc">${ev.desc}</div></div>
+    </div>`).join("");
+}
+
+function selectOutput(idx) {
+  const outputs = OUTPUT_EVENTS[state.agent.name] || OUTPUT_EVENTS._default;
+  state.output = outputs[idx];
+  document.querySelectorAll("#outputList .event-item").forEach((el,i) => el.classList.toggle("selected", parseInt(el.dataset.idx) === idx));
+  document.getElementById("btn-5").disabled = false;
+}
+
+// Step 6: Generate benefits via LiteLLM
+async function generateBenefits() {
+  const area = document.getElementById("benefitsArea");
+  area.innerHTML = '<div class="loading"><div class="spinner"></div>Generating personalized benefits analysis...</div>';
+
+  const prompt = `You are an SAP business value consultant. Generate a concise, compelling business impact analysis for the following scenario.
+
+Company: ${state.company}
+SAP System: ${SYSTEMS.find(s=>s.id===state.system).name}
+Trigger Event: ${state.event.name} - ${state.event.desc}
+AI Agent: ${state.agent.name} - ${state.agent.desc}
+Output Action: ${state.output.name} - ${state.output.desc}
+
+Write a short business impact summary (max 300 words) structured as:
+1. A one-line executive summary of the value
+2. Three specific, quantified benefits (use industry benchmarks: cost savings %, time reduction, risk avoided)
+3. A "Before vs After" comparison (2 bullets each)
+
+Use HTML formatting with <h3> for headers, <strong> for emphasis, <ul>/<li> for lists. Be specific and use realistic numbers. Address ${state.company} directly.`;
+
+  try {
+    const res = await fetch("https://lite-llm.mymaas.net/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer sk-Pns7dn9fgQWl5kokhNz43w" },
+      body: JSON.stringify({
+        model: "azure-gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 800,
+        temperature: 0.7
+      })
+    });
+    const data = await res.json();
+    if (data.choices && data.choices[0]) {
+      area.innerHTML = '<div class="benefits-content">' + data.choices[0].message.content + '</div>';
+    } else {
+      area.innerHTML = '<div class="benefits-content"><p>Unable to generate analysis. Please try again.</p></div>';
+    }
+  } catch (err) {
+    area.innerHTML = `<div class="benefits-content"><p>Connection error. Please check your network and try again.</p><p style="font-size:12px;color:var(--muted)">${err.message}</p></div>`;
+  }
+}
+
+// ─── INIT ───
+renderProgress();
+document.getElementById("companyName").addEventListener("keydown", e => {
+  if (e.key === "Enter") nextStep();
+});
+</script>
+</body>
+</html>

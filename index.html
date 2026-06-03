@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Joule + Advanced Event Mesh | Event-Driven Agentic AI</title>
+<meta name="description" content="A reusable pattern and eleven ready-to-run plays combining SAP Joule agents with SAP Advanced Event Mesh for event-driven agentic AI.">
+<meta name="theme-color" content="#093B5F">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep: #093B5F;
+    --accent: #00C895;
+    --dark: #03213B;
+    --ink: #1a2b36;
+    --body: #3d4f5f;
+    --muted: #6b7f8e;
+    --paper: #ffffff;
+    --soft: #f7f8fa;
+    --line: #e5e9ed;
+    --font: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font);
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--body);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font);
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  p { max-width: 720px; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes flowPulse {
+    0%, 100% { opacity: 0.4; transform: scaleX(0.95); }
+    50% { opacity: 1; transform: scaleX(1); }
+  }
+  @keyframes dotMove {
+    0% { left: 0%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line);
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(9,59,95,.08); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  nav .brand { font-size: 16px; font-weight: 700; color: var(--deep); text-decoration: none; }
+  nav .brand span { color: var(--accent); }
+  nav .links { display: flex; gap: 32px; }
+  nav .links a {
+    font-size: 15px; font-weight: 500; color: var(--body);
+    text-decoration: none; transition: color .2s;
+  }
+  nav .links a:hover { color: var(--accent); }
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+  .hamburger svg { width: 26px; height: 26px; stroke: var(--deep); stroke-width: 2; fill: none; }
+  @media(max-width:760px){
+    nav .links { display: none; position: absolute; top: 64px; left: 0; right: 0; background: rgba(255,255,255,.97); backdrop-filter: blur(12px); flex-direction: column; padding: 24px 32px; gap: 18px; border-bottom: 1px solid var(--line); }
+    nav .links.open { display: flex; animation: fadeIn .2s ease; }
+    .hamburger { display: block; }
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: linear-gradient(160deg, var(--deep) 0%, var(--dark) 100%);
+    color: #fff; padding: 100px 0 80px; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -40%; right: -15%;
+    width: 70%; height: 180%;
+    background: radial-gradient(ellipse at center, rgba(0,200,149,.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero .label {
+    display: inline-block; font-size: 14px; font-weight: 600;
+    color: var(--accent); letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 20px; animation: fadeIn .8s ease .2s both;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 64px); color: #fff; font-weight: 700;
+    max-width: 800px; animation: fadeInUp .8s var(--ease) .3s both;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero .sub {
+    font-size: clamp(18px, 2.2vw, 22px); color: rgba(255,255,255,.75);
+    max-width: 680px; margin-top: 24px; font-weight: 400; line-height: 1.6;
+    animation: fadeInUp .8s var(--ease) .5s both;
+  }
+  .hero .byline {
+    margin-top: 32px; font-size: 15px; color: rgba(255,255,255,.5);
+    animation: fadeIn .8s ease .7s both;
+  }
+  .hero .byline strong { color: rgba(255,255,255,.85); }
+
+  /* ─── HERO FLOW ANIMATION ─── */
+  .hero-flow { margin-top: 56px; animation: fadeInUp .8s var(--ease) .9s both; }
+  .flow-visual {
+    display: flex; align-items: center; gap: 0;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px; padding: 28px 24px;
+  }
+  .flow-step {
+    flex: 1; text-align: center; padding: 0 12px;
+  }
+  .flow-step .icon {
+    width: 48px; height: 48px; margin: 0 auto 12px;
+    background: rgba(0,200,149,.12); border: 1px solid rgba(0,200,149,.3);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .flow-step h4 {
+    font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 4px;
+  }
+  .flow-step p {
+    font-size: 14px; color: rgba(255,255,255,.6); max-width: none; line-height: 1.4;
+  }
+  .flow-connector {
+    width: 56px; flex-shrink: 0; position: relative; height: 4px;
+    background: rgba(0,200,149,.15); border-radius: 2px; overflow: hidden;
+  }
+  .flow-connector::after {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 24px; height: 100%; background: var(--accent);
+    border-radius: 2px; animation: dotMove 2s ease-in-out infinite;
+  }
+  .flow-connector:nth-of-type(4)::after { animation-delay: 0.4s; }
+  @media(max-width:760px){
+    .flow-visual { flex-direction: column; gap: 20px; padding: 24px 20px; }
+    .flow-connector { width: 4px; height: 32px; }
+    .flow-connector::after { width: 100%; height: 16px; animation-name: dotMoveV; }
+    @keyframes dotMoveV {
+      0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; }
+    }
+  }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 88px 0; }
+  section.shaded { background: var(--soft); }
+  .sec-label {
+    font-size: 14px; font-weight: 600; color: var(--accent);
+    letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .sec-title {
+    font-size: clamp(28px, 4vw, 42px); margin-bottom: 16px;
+  }
+  .sec-desc {
+    font-size: 18px; color: var(--body); margin-bottom: 48px;
+  }
+
+  /* ─── PATTERN CARDS ─── */
+  .pattern-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  @media(max-width:840px) { .pattern-grid { grid-template-columns: 1fr; } }
+  .pattern-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 32px; transition: transform .3s var(--ease), box-shadow .3s;
+  }
+  .pattern-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(9,59,95,.08); }
+  .pattern-card .step-num {
+    font-size: 14px; font-weight: 700; color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .pattern-card h3 { font-size: 22px; margin-bottom: 10px; }
+  .pattern-card p { font-size: 16px; color: var(--body); max-width: none; }
+
+  /* ─── PRODUCTION STRIP ─── */
+  .prod-strip {
+    margin-top: 40px; background: var(--dark); border-radius: 16px;
+    padding: 32px 36px; color: #fff;
+  }
+  .prod-strip h4 { font-size: 16px; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+  .prod-items { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+  .prod-items span { font-size: 16px; color: rgba(255,255,255,.7); }
+  .prod-items strong { color: #fff; }
+
+  /* ─── PLAY CARDS ─── */
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+  .filters button {
+    font-family: var(--font); font-size: 15px; font-weight: 500;
+    color: var(--body); background: #fff; border: 1px solid var(--line);
+    padding: 10px 20px; border-radius: 8px; cursor: pointer;
+    transition: all .2s var(--ease);
+  }
+  .filters button:hover { border-color: var(--accent); color: var(--deep); }
+  .filters button.active {
+    background: var(--deep); color: #fff; border-color: var(--deep);
+  }
+
+  .plays-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+
+  .play-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 36px; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 32px; transition: transform .3s var(--ease), box-shadow .3s;
+  }
+  .play-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(9,59,95,.08); }
+  @media(max-width:840px) { .play-card { grid-template-columns: 1fr; } }
+
+  .play-card .play-left {}
+  .play-card .play-industry {
+    font-size: 13px; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  .play-card .play-num {
+    font-size: 48px; font-weight: 700; color: var(--line); line-height: 1;
+    position: absolute; top: 32px; right: 36px;
+  }
+  .play-card { position: relative; }
+  .play-card h3 { font-size: 22px; margin-bottom: 16px; padding-right: 60px; }
+  .play-card .play-desc { font-size: 16px; color: var(--body); margin-bottom: 20px; max-width: none; }
+
+  .play-steps {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media(max-width:520px) { .play-steps { grid-template-columns: 1fr; } }
+  .play-step-item {
+    background: var(--soft); border-radius: 10px; padding: 14px 16px;
+  }
+  .play-step-item .ps-label {
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+  }
+  .play-step-item p { font-size: 14px; color: var(--body); max-width: none; line-height: 1.45; }
+
+  .play-right { display: flex; flex-direction: column; justify-content: center; }
+  .play-metrics {}
+  .play-metrics h4 {
+    font-size: 14px; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;
+  }
+  .metric-row {
+    display: flex; gap: 12px; align-items: baseline;
+    padding: 8px 0; border-top: 1px solid var(--line);
+  }
+  .metric-row:first-of-type { border-top: none; }
+  .metric-row .metric-val { font-size: 18px; font-weight: 700; color: var(--deep); min-width: 100px; }
+  .metric-row .metric-lbl { font-size: 15px; color: var(--body); }
+
+  .play-guard {
+    margin-top: 16px; font-size: 14px; color: var(--muted);
+    font-style: italic; padding-top: 12px; border-top: 1px dashed var(--line);
+  }
+
+  /* ─── WHERE TO START ─── */
+  .start-section {
+    background: linear-gradient(160deg, var(--deep) 0%, var(--dark) 100%);
+    color: #fff; position: relative; overflow: hidden;
+  }
+  .start-section::before {
+    content: ''; position: absolute; bottom: -30%; left: -10%;
+    width: 60%; height: 160%;
+    background: radial-gradient(ellipse at center, rgba(0,200,149,.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .start-section .sec-title { color: #fff; }
+  .start-section .sec-desc { color: rgba(255,255,255,.7); }
+
+  .start-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media(max-width:760px) { .start-grid { grid-template-columns: 1fr; } }
+  .start-card {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px; padding: 32px;
+    transition: transform .3s var(--ease), box-shadow .3s;
+  }
+  .start-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,200,149,.08); }
+  .start-card h4 { font-size: 16px; color: var(--accent); margin-bottom: 16px; }
+  .start-card ul { list-style: none; margin-bottom: 12px; }
+  .start-card li {
+    font-size: 17px; color: rgba(255,255,255,.9); padding: 8px 0 8px 20px; position: relative;
+  }
+  .start-card li::before {
+    content: ''; width: 8px; height: 8px; background: var(--accent);
+    border-radius: 50%; position: absolute; left: 0; top: 16px;
+  }
+  .start-card li strong { color: var(--accent); }
+  .start-card .start-note { font-size: 14px; color: rgba(255,255,255,.5); font-style: italic; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--dark); color: rgba(255,255,255,.5);
+    padding: 40px 0; text-align: center; font-size: 14px;
+  }
+  footer strong { color: rgba(255,255,255,.8); }
+  footer .foot-links {
+    margin-top: 16px; display: flex; flex-wrap: wrap;
+    gap: 8px 24px; justify-content: center; font-size: 15px;
+  }
+  footer .foot-links a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  footer .foot-links a:hover { text-decoration: underline; }
+  footer .foot-src { margin-top: 16px; font-size: 13px; color: rgba(255,255,255,.35); }
+
+  /* ─── BACK TO TOP ─── */
+  .back-to-top {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 48px; height: 48px; background: var(--deep);
+    border: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; transform: translateY(12px);
+    transition: all .3s var(--ease); z-index: 40;
+    box-shadow: 0 4px 20px rgba(3,33,59,.3);
+  }
+  .back-to-top.visible { opacity: 1; transform: translateY(0); }
+  .back-to-top:hover { background: var(--accent); transform: translateY(-2px); }
+  .back-to-top svg { width: 20px; height: 20px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
+  /* ─── REDUCED MOTION ─── */
+  @media(prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#">Joule <span>+</span> Advanced Event Mesh</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="links" id="navLinks">
+      <a href="#pattern">Pattern</a>
+      <a href="#plays">Plays</a>
+      <a href="#start">Where to Start</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="label">Event-Driven Agentic AI</div>
+    <h1>SAP Joule<br><span>+</span> SAP Advanced Event Mesh</h1>
+    <p class="sub">A reusable pattern and eleven ready-to-run plays. AI agents that react to business events in real time, not overnight batches.</p>
+
+    <div class="hero-flow">
+      <div class="flow-visual">
+        <div class="flow-step">
+          <div class="icon">📡</div>
+          <h4>Event happens</h4>
+          <p>An S/4HANA order, a sensor alert, Master Data event</p>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-step">
+          <div class="icon">🧠</div>
+          <h4>Agent reasons</h4>
+          <p>Joule decides what to do using live data</p>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-step">
+          <div class="icon">⚡</div>
+          <h4>Action taken</h4>
+          <p>A governed transaction flows to the right systems</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PATTERN -->
+<section id="pattern">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">The Pattern</div>
+      <h2 class="sec-title">A real-time loop between events and AI</h2>
+      <p class="sec-desc">SAP Joule brings the intelligence. SAP Advanced Event Mesh brings the real-time delivery, security, and governance that make AI safe in production across S/4HANA, SuccessFactors, Ariba, and beyond.</p>
+    </div>
+
+    <div class="pattern-grid">
+      <div class="pattern-card reveal">
+        <div class="step-num">Step 1</div>
+        <h3>Trigger</h3>
+        <p>A business event fires from SAP S/4HANA, SuccessFactors, or Ariba. The Joule agent wakes instantly. No polling, no waiting.</p>
+      </div>
+      <div class="pattern-card reveal">
+        <div class="step-num">Step 2</div>
+        <h3>Reason</h3>
+        <p>The agent queries live data from SAP S/4HANA, SAP IBP, SAP TM, and SAP Ariba, then makes a decision based on what's true right now.</p>
+      </div>
+      <div class="pattern-card reveal">
+        <div class="step-num">Step 3</div>
+        <h3>Act</h3>
+        <p>A secure, governed event is published back onto SAP Advanced Event Mesh. It drives a transaction in SAP S/4HANA and fans out to every connected system.</p>
+      </div>
+    </div>
+
+    <div class="prod-strip reveal">
+      <h4>Why it's production-grade</h4>
+      <div class="prod-items">
+        <span><strong>Governed routing</strong>: every event goes to the right place</span>
+        <span><strong>Security</strong>: access controls per topic</span>
+        <span><strong>Throttled</strong>: rate limits prevent runaway agents</span>
+        <span><strong>Guaranteed delivery</strong>: nothing gets lost</span>
+        <span><strong>Schema-validated</strong>: well-formed by design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYS -->
+<section id="plays" class="shaded">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">The Plays</div>
+      <h2 class="sec-title">Eleven plays, one pattern</h2>
+      <p class="sec-desc">Each play is the same three-step loop applied to a different business problem. Filter by industry to find yours.</p>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="plays-grid" id="cards"></div>
+  </div>
+</section>
+
+<!-- WHERE TO START -->
+<section id="start" class="start-section">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">Where to Start</div>
+      <h2 class="sec-title">Land one, and the rest follow</h2>
+      <p class="sec-desc">Every play is the same loop. Once you prove the pattern, the remaining ten are configuration, not reinvention.</p>
+    </div>
+
+    <div class="start-grid">
+      <div class="start-card reveal">
+        <h4>Fastest to prove</h4>
+        <ul>
+          <li>Predictive maintenance → work order <strong>(03)</strong></li>
+          <li>Invoice exception resolution <strong>(05)</strong></li>
+          <li>Shipment exception &amp; customer ETA <strong>(08)</strong></li>
+        </ul>
+        <div class="start-note">Bounded scope, obvious before/after, low risk.</div>
+      </div>
+      <div class="start-card reveal">
+        <h4>Highest business value</h4>
+        <ul>
+          <li>Order-to-cash exception triage <strong>(01)</strong></li>
+          <li>Supply disruption &amp; resequencing <strong>(02)</strong></li>
+          <li>Real-time treasury &amp; liquidity <strong>(04)</strong></li>
+        </ul>
+        <div class="start-note">Touches revenue, continuity, and cash. Board-level outcomes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    SAP Joule + Advanced Event Mesh · A reusable pattern and 11 plays · <strong>Solace</strong> · EMEA &amp; UK
+    <div class="foot-links">
+      <a href="https://www.sap.com/products/technology-platform/integration-suite/advanced-event-mesh.html" target="_blank" rel="noopener">SAP Advanced Event Mesh</a>
+      <a href="https://www.sap.com/products/artificial-intelligence.html" target="_blank" rel="noopener">SAP Joule</a>
+      <a href="https://www.sap.com/products/technology-platform/integration-suite/agentic-ai.html" target="_blank" rel="noopener">SAP Integration Suite: Agentic AI</a>
+    </div>
+    <div class="foot-src">Benchmark sources: Ardent Partners; Deloitte; The Hackett Group; industry reports. Figures are directional, not guarantees.</div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+const SCENARIOS = [
+  { n:"01", cat:"Manufacturing", ind:"SAP S/4HANA Sales & Distribution",
+    title:"Order-to-cash exception triage",
+    desc:"Resolves at-risk orders the moment they're booked, before they slip or get cancelled.",
+    sense:"An S/4HANA Sales Order Created event fires, or an ATP shortfall triggers a delivery delay in SAP EWM.",
+    reason:"Query SAP S/4HANA Material Availability (ATP), SAP EWM warehouse stock, and SAP TM lead times in real time.",
+    act:"Surface fulfillment options to the sales rep via SAP Joule in the S/4HANA Fiori launchpad.",
+    metrics:[["1–5%","of order value in chargebacks avoided"],["Hours → minutes","to triage an at-risk order"],["~$4M / year","deductions protected for an $80M shipper"]],
+    guard:"Proposal-only. Pricing and shipping changes require human approval in S/4HANA." },
+
+  { n:"02", cat:"Automotive", ind:"SAP S/4HANA Manufacturing & SAP IBP",
+    title:"Supply disruption & production resequencing",
+    desc:"Turns a single late inbound into an immediate, scoped line-plan adjustment.",
+    sense:"An S/4HANA Purchase Order Changed event fires, or a 3PL ETA revision arrives via SAP Business Network.",
+    reason:"Correlate with SAP S/4HANA Production Orders and SAP IBP supply plan; evaluate buffer stock or alternate sourcing via SAP Ariba.",
+    act:"Issue a resequence request into SAP S/4HANA PP/DS and notify procurement via SAP Ariba.",
+    metrics:[[">$2.3M / hr","line-stoppage cost protected"],["5–20%","of capacity at risk from disruption"],["Lower","emergency freight spend"]],
+    guard:"Expedite spend is capped. Anything above the threshold routes to a human in SAP S/4HANA." },
+
+  { n:"03", cat:"Manufacturing", ind:"SAP S/4HANA Asset Management",
+    title:"Predictive maintenance → work order",
+    desc:"Reactive breakdowns become planned, parts-ready repairs during maintenance windows.",
+    sense:"IoT telemetry from SAP Digital Manufacturing or SAP Asset Performance Management crosses an anomaly threshold.",
+    reason:"Assess severity against SAP S/4HANA Equipment Master and maintenance history; check spare parts in SAP EWM.",
+    act:"Create a PM Maintenance Order in SAP S/4HANA with parts reservation and technician scheduling via SAP Field Service Management.",
+    metrics:[["30–50%","less unplanned downtime"],["10–40%","lower maintenance cost"],["~$125k / hr","downtime cost avoided"]],
+    guard:"Rate-limited. A sensor storm can never raise hundreds of work orders in S/4HANA." },
+
+  { n:"04", cat:"Finance", ind:"SAP S/4HANA Treasury & SAP Multi-Bank Connectivity",
+    title:"Real-time treasury & liquidity",
+    desc:"Funding decisions made on today's reality, not yesterday's snapshot.",
+    sense:"Bank statements arrive via SAP Multi-Bank Connectivity (camt.053), or Journal Entry Created events fire in SAP S/4HANA.",
+    reason:"Roll up group cash position across company codes in SAP S/4HANA Cash Management; model shortfalls against live FX from SAP Treasury.",
+    act:"Draft an intercompany funding proposal in SAP In-House Cash for treasury approval.",
+    metrics:[["1–2%","early-payment discounts captured"],["Real-time","group cash position"],["Lower","idle cash and overdraft interest"]],
+    guard:"The agent proposes, a human releases in SAP S/4HANA. Segregation of duties is enforced." },
+
+  { n:"05", cat:"Finance", ind:"SAP S/4HANA Accounts Payable",
+    title:"Invoice exception resolution",
+    desc:"Auto-matches and investigates the exceptions that stall accounts payable.",
+    sense:"A Supplier Invoice Created event fires in SAP S/4HANA but fails the 3-way match (PO, goods receipt, invoice).",
+    reason:"Query the Purchase Order, Goods Receipt, and tolerance rules in SAP S/4HANA MM; check vendor master via SAP Business Partner.",
+    act:"Release the payment block in SAP S/4HANA AP, post the correction, or escalate with the full reason attached.",
+    metrics:[["$12.88 → <$3","cost per invoice processed"],["17 → 3 days","invoice cycle time"],["22% → 9%","exception rate"]],
+    guard:"Auto-resolves within tolerance; anything outside is routed, never silently posted in S/4HANA." },
+
+  { n:"06", cat:"Finance", ind:"SAP S/4HANA Payments & SAP Business Integrity Screening",
+    title:"Fraud & duplicate-payment interception",
+    desc:"Stops a bad payment before it goes out, rather than clawing it back.",
+    sense:"A Supplier Invoice is posted in SAP S/4HANA, or a Payment Run Scheduled event fires.",
+    reason:"Score against SAP Business Integrity Screening rules, vendor master changes, and payment history in SAP S/4HANA.",
+    act:"Hold the suspect payment in SAP S/4HANA and open a case in SAP Business Integrity Screening before the run executes.",
+    metrics:[["~1%","of spend at risk from duplicates"],["Up to 95%","of duplicates caught before payment"],["~$5M","exposure addressed on $500M spend"]],
+    guard:"Hold action is narrowly scoped; full audit trail maintained in SAP S/4HANA." },
+
+  { n:"07", cat:"Retail", ind:"SAP S/4HANA Retail & SAP CAR",
+    title:"Dynamic pricing & markdown optimization",
+    desc:"Reacts to demand and overstock risk before margin erodes.",
+    sense:"POS sell-through data from SAP Customer Activity Repository (CAR) and stock-level changes from SAP S/4HANA Inventory Management stream in by region.",
+    reason:"Analyze velocity in SAP CAR; compute margin-aware pricing using SAP S/4HANA Pricing Conditions.",
+    act:"Publish a price-change proposal into SAP S/4HANA Condition Records; large moves route to a merchandiser via SAP Joule.",
+    metrics:[["Margin","defended in real time"],["Fewer","forced end-of-season markdowns"],["Days → minutes","to execute a price move"]],
+    guard:"Price bands are guardrailed in SAP S/4HANA; moves beyond a set percentage require approval." },
+
+  { n:"08", cat:"Logistics", ind:"SAP S/4HANA Logistics & SAP Transportation Management",
+    title:"Shipment exception & proactive customer ETA",
+    desc:"Tells the customer before they have to ask.",
+    sense:"Goods Issue events from SAP S/4HANA and carrier delay notifications from SAP Transportation Management reveal a slipping delivery.",
+    reason:"Evaluate reroute vs. expedite options in SAP TM; pull customer commitments from SAP S/4HANA Sales Order.",
+    act:"Issue a reroute in SAP TM and send a customer notification via SAP Emarsys Customer Engagement.",
+    metrics:[["$15–25","per chargeback avoided"],["Fewer","'where is my order' contacts"],["1–5%","OTIF chargebacks avoided"]],
+    guard:"Customer notifications are rate-limited per order. No one gets spammed." },
+
+  { n:"09", cat:"Energy", ind:"SAP S/4HANA EHS & SAP Sustainability Control Tower",
+    title:"ESG & emissions compliance monitoring",
+    desc:"Continuously reconciles operational data against regulatory limits.",
+    sense:"Emissions telemetry from SAP Digital Manufacturing and production output events from SAP S/4HANA stream in real time.",
+    reason:"Aggregate against EU ETS/CBAM thresholds using SAP Sustainability Control Tower; spot breach trajectories early.",
+    act:"Raise a compliance alert in SAP S/4HANA EHS Management and draft the CSRD report entry in SAP Sustainability Control Tower.",
+    metrics:[["Fines avoided","regulatory penalties and CBAM gaps"],["Lower effort","in CSRD compliance prep"],["Early warning","breach caught as a trend"]],
+    guard:"Alerts are de-duplicated; regulated figures are schema-validated per EU taxonomy." },
+
+  { n:"10", cat:"Procurement", ind:"SAP S/4HANA Procurement & SAP Ariba",
+    title:"Intelligent procurement & supplier-risk gating",
+    desc:"Brings live risk and market intelligence into the approval moment.",
+    sense:"A Purchase Order Created event fires in SAP S/4HANA, or a supplier risk score changes in SAP Ariba Supplier Risk.",
+    reason:"Check supplier financial and ESG risk in SAP Ariba; benchmark the price against SAP Ariba Discovery market data.",
+    act:"Gate the approval workflow in SAP S/4HANA or suggest an alternate supplier from SAP Ariba.",
+    metrics:[["10–20%","of savings lost to maverick spend"],["25–80%","of off-contract spend, now gated"],["5–16%","of negotiated savings recovered"]],
+    guard:"Routing only. The agent never auto-approves in SAP S/4HANA." },
+
+  { n:"11", cat:"Field Service", ind:"SAP S/4HANA Service & SAP SuccessFactors",
+    title:"Real-time workforce dispatch",
+    desc:"Closes the gap between demand and available skills the instant it opens.",
+    sense:"A Service Request Created event fires in SAP S/4HANA Service Management, or a shift gap is detected in SAP SuccessFactors Time Management.",
+    reason:"Match qualified resources from SAP SuccessFactors Employee Central against SLA, skills, travel time, and SAP S/4HANA Service Level Agreements.",
+    act:"Propose the assignment in SAP S/4HANA and update the schedule in SAP SuccessFactors Workforce Management.",
+    metrics:[["Higher","first-time-fix rate"],["Lower","overtime and travel time"],["Protected","SLA penalties"]],
+    guard:"SAP SuccessFactors working-time rules enforced; proposals throttled per worker." }
+];
+
+function cardHTML(s) {
+  const mets = s.metrics.map(m => `<div class="metric-row"><span class="metric-val">${m[0]}</span><span class="metric-lbl">${m[1]}</span></div>`).join("");
+  return `<article class="play-card" data-cat="${s.cat}">
+    <div class="play-left">
+      <div class="play-industry">${s.ind}</div>
+      <span class="play-num">${s.n}</span>
+      <h3>${s.title}</h3>
+      <p class="play-desc">${s.desc}</p>
+      <div class="play-steps">
+        <div class="play-step-item"><div class="ps-label">Trigger</div><p>${s.sense}</p></div>
+        <div class="play-step-item"><div class="ps-label">Reason</div><p>${s.reason}</p></div>
+        <div class="play-step-item"><div class="ps-label">Act</div><p>${s.act}</p></div>
+      </div>
+    </div>
+    <div class="play-right">
+      <div class="play-metrics">
+        <h4>Business impact</h4>
+        ${mets}
+      </div>
+      <div class="play-guard">${s.guard}</div>
+    </div>
+  </article>`;
+}
+
+const cardsEl = document.getElementById("cards");
+const filtersEl = document.getElementById("filters");
+
+function render(cat) {
+  cardsEl.innerHTML = SCENARIOS.filter(s => cat === "All" || s.cat === cat).map(cardHTML).join("");
+}
+
+const cats = ["All", ...Array.from(new Set(SCENARIOS.map(s => s.cat)))];
+filtersEl.innerHTML = cats.map((c, i) => `<button class="${i === 0 ? 'active' : ''}" data-c="${c}">${c}</button>`).join("");
+filtersEl.addEventListener("click", e => {
+  if (e.target.tagName !== "BUTTON") return;
+  filtersEl.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  e.target.classList.add("active");
+  render(e.target.dataset.c);
+});
+render("All");
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: "0px 0px -60px 0px" });
+
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+// Nav shadow
+const nav = document.getElementById("nav");
+window.addEventListener("scroll", () => {
+  nav.classList.toggle("scrolled", window.scrollY > 20);
+}, { passive: true });
+
+// Mobile nav
+document.getElementById("hamburger").addEventListener("click", () => {
+  document.getElementById("navLinks").classList.toggle("open");
+});
+document.querySelectorAll("#navLinks a").forEach(a => {
+  a.addEventListener("click", () => document.getElementById("navLinks").classList.remove("open"));
+});
+
+// Back to top
+const backToTop = document.getElementById("backToTop");
+window.addEventListener("scroll", () => {
+  backToTop.classList.toggle("visible", window.scrollY > 400);
+}, { passive: true });
+backToTop.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+</script>
+</body>
+</html>

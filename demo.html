@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAP Joule + AEM | Agent Builder Demo</title>
+<title>SAP Joule + SAP Advanced Event Mesh | Agent Builder</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,13 +56,20 @@ input[type="text"]:focus{border-color:var(--accent)}
 .sel-item .sel-desc{font-size:13px;color:var(--muted);margin-top:3px}
 .sel-item .sel-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;color:var(--accent);background:rgba(0,200,149,.1);padding:3px 8px;border-radius:4px}
 
+/* Suggestions */
+.suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.suggestions .sug{font-family:var(--font);font-size:13px;font-weight:500;color:var(--body);background:var(--soft);border:1px solid var(--line);padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s var(--ease)}
+.suggestions .sug:hover{border-color:var(--accent);color:var(--ink);background:rgba(0,200,149,.04)}
+
 /* Event list */
-.event-list{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:8px}
-.event-item{padding:14px 16px;border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:all .2s var(--ease);display:flex;justify-content:space-between;align-items:center}
+.event-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:8px}
+.event-item{padding:16px 18px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:all .2s var(--ease)}
 .event-item:hover{border-color:var(--accent);background:rgba(0,200,149,.03)}
 .event-item.selected{border-color:var(--accent);background:rgba(0,200,149,.06);box-shadow:0 0 0 2px rgba(0,200,149,.2)}
-.event-item .ev-name{font-size:14px;font-weight:600;color:var(--ink)}
-.event-item .ev-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.event-item .ev-top{display:flex;justify-content:space-between;align-items:center}
+.event-item .ev-name{font-size:15px;font-weight:600;color:var(--ink)}
+.event-item .ev-desc{font-size:13px;color:var(--muted);margin-top:3px}
+.event-item .ev-topic{font-family:var(--font);font-size:11.5px;color:var(--accent);background:rgba(0,200,149,.06);padding:4px 10px;border-radius:5px;margin-top:8px;display:inline-block;word-break:break-all}
 .event-item .ev-freq{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
 
 /* Agent card */
@@ -122,7 +129,7 @@ input[type="text"]:focus{border-color:var(--accent)}
 
 <div class="app">
   <div class="app-header">
-    <h1>Joule <span>+</span> Advanced Event Mesh</h1>
+    <h1>SAP Joule <span>+</span> SAP Advanced Event Mesh</h1>
     <p>Build your real-time AI agent scenario</p>
   </div>
 
@@ -216,26 +223,26 @@ const SYSTEMS = [
 
 const EVENTS = {
   s4hana: [
-    {id:"so_created", name:"SalesOrder.Created", desc:"New sales order is booked", freq:"~2,400/day"},
-    {id:"so_changed", name:"SalesOrder.Changed", desc:"Sales order is modified", freq:"~4,100/day"},
-    {id:"po_created", name:"PurchaseOrder.Created", desc:"New purchase order raised", freq:"~1,800/day"},
-    {id:"po_changed", name:"PurchaseOrder.Changed", desc:"Purchase order modified or confirmed", freq:"~3,200/day"},
-    {id:"inv_created", name:"SupplierInvoice.Created", desc:"Supplier invoice posted for matching", freq:"~1,200/day"},
-    {id:"gr_posted", name:"GoodsReceipt.Posted", desc:"Goods received against a PO", freq:"~2,000/day"},
-    {id:"gi_posted", name:"GoodsIssue.Posted", desc:"Goods issued for delivery or production", freq:"~1,600/day"},
-    {id:"je_posted", name:"JournalEntry.Posted", desc:"Financial journal entry posted", freq:"~8,500/day"},
-    {id:"bp_changed", name:"BusinessPartner.Changed", desc:"Customer or vendor master data updated", freq:"~600/day"},
-    {id:"del_created", name:"OutboundDelivery.Created", desc:"Delivery document created for shipment", freq:"~1,400/day"},
-    {id:"del_gi", name:"OutboundDelivery.GoodsIssued", desc:"Shipment left the warehouse", freq:"~1,300/day"},
-    {id:"mat_changed", name:"Material.Changed", desc:"Material master record updated", freq:"~900/day"},
-    {id:"pay_exec", name:"PaymentRun.Executed", desc:"Automated payment batch completed", freq:"~120/day"},
-    {id:"maint_req", name:"MaintenanceOrder.Requested", desc:"PM work order requested", freq:"~340/day"},
-    {id:"prodord", name:"ProductionOrder.Released", desc:"Manufacturing order released to shop floor", freq:"~780/day"},
-    {id:"billing_created", name:"BillingDocument.Created", desc:"Invoice or credit memo created", freq:"~2,100/day"},
-    {id:"atp_short", name:"ATP.Shortfall", desc:"Available-to-promise check failed", freq:"~280/day"},
-    {id:"cred_block", name:"CreditBlock.Triggered", desc:"Order blocked due to credit limit", freq:"~150/day"},
-    {id:"contract_exp", name:"Contract.Expiring", desc:"Customer or vendor contract nearing end", freq:"~45/day"},
-    {id:"cost_overrun", name:"CostCenter.BudgetExceeded", desc:"Cost center exceeded planned budget", freq:"~60/day"}
+    {id:"so_created", name:"SalesOrder.Created", desc:"New sales order is booked", freq:"~2,400/day", topic:"sap/s4/PRD/ce/sap/s4/beh/salesorder/v1/SalesOrder/Created/v1"},
+    {id:"so_changed", name:"SalesOrder.Changed", desc:"Sales order is modified", freq:"~4,100/day", topic:"sap/s4/PRD/ce/sap/s4/beh/salesorder/v1/SalesOrder/Changed/v1"},
+    {id:"po_created", name:"PurchaseOrder.Created", desc:"New purchase order raised", freq:"~1,800/day", topic:"sap/s4/PRD/ce/sap/s4/beh/purchaseorder/v1/PurchaseOrder/Created/v1"},
+    {id:"po_changed", name:"PurchaseOrder.Changed", desc:"Purchase order modified or confirmed", freq:"~3,200/day", topic:"sap/s4/PRD/ce/sap/s4/beh/purchaseorder/v1/PurchaseOrder/Changed/v1"},
+    {id:"inv_created", name:"SupplierInvoice.Created", desc:"Supplier invoice posted for matching", freq:"~1,200/day", topic:"sap/s4/PRD/ce/sap/s4/beh/supplierinvoice/v1/SupplierInvoice/Created/v1"},
+    {id:"gr_posted", name:"GoodsReceipt.Posted", desc:"Goods received against a PO", freq:"~2,000/day", topic:"sap/s4/PRD/ce/sap/s4/beh/goodsreceipt/v1/GoodsReceipt/Posted/v1"},
+    {id:"gi_posted", name:"GoodsIssue.Posted", desc:"Goods issued for delivery or production", freq:"~1,600/day", topic:"sap/s4/PRD/ce/sap/s4/beh/goodsissue/v1/GoodsIssue/Posted/v1"},
+    {id:"je_posted", name:"JournalEntry.Posted", desc:"Financial journal entry posted", freq:"~8,500/day", topic:"sap/s4/PRD/ce/sap/s4/beh/journalentry/v1/JournalEntry/Posted/v1"},
+    {id:"bp_changed", name:"BusinessPartner.Changed", desc:"Customer or vendor master data updated", freq:"~600/day", topic:"sap/s4/PRD/ce/sap/s4/beh/businesspartner/v1/BusinessPartner/Changed/v1"},
+    {id:"del_created", name:"OutboundDelivery.Created", desc:"Delivery document created for shipment", freq:"~1,400/day", topic:"sap/s4/PRD/ce/sap/s4/beh/outbounddelivery/v1/OutboundDelivery/Created/v1"},
+    {id:"del_gi", name:"OutboundDelivery.GoodsIssued", desc:"Shipment left the warehouse", freq:"~1,300/day", topic:"sap/s4/PRD/ce/sap/s4/beh/outbounddelivery/v1/OutboundDelivery/GoodsIssued/v1"},
+    {id:"mat_changed", name:"Material.Changed", desc:"Material master record updated", freq:"~900/day", topic:"sap/s4/PRD/ce/sap/s4/beh/material/v1/Material/Changed/v1"},
+    {id:"pay_exec", name:"PaymentRun.Executed", desc:"Automated payment batch completed", freq:"~120/day", topic:"sap/s4/PRD/ce/sap/s4/beh/paymentrun/v1/PaymentRun/Executed/v1"},
+    {id:"maint_req", name:"MaintenanceOrder.Requested", desc:"PM work order requested", freq:"~340/day", topic:"sap/s4/PRD/ce/sap/s4/beh/maintenanceorder/v1/MaintenanceOrder/Requested/v1"},
+    {id:"prodord", name:"ProductionOrder.Released", desc:"Manufacturing order released to shop floor", freq:"~780/day", topic:"sap/s4/PRD/ce/sap/s4/beh/productionorder/v1/ProductionOrder/Released/v1"},
+    {id:"billing_created", name:"BillingDocument.Created", desc:"Invoice or credit memo created", freq:"~2,100/day", topic:"sap/s4/PRD/ce/sap/s4/beh/billingdocument/v1/BillingDocument/Created/v1"},
+    {id:"atp_short", name:"ATP.Shortfall", desc:"Available-to-promise check failed", freq:"~280/day", topic:"sap/s4/PRD/ce/sap/s4/beh/atp/v1/ATP/Shortfall/v1"},
+    {id:"cred_block", name:"CreditBlock.Triggered", desc:"Order blocked due to credit limit", freq:"~150/day", topic:"sap/s4/PRD/ce/sap/s4/beh/creditmanagement/v1/CreditBlock/Triggered/v1"},
+    {id:"contract_exp", name:"Contract.Expiring", desc:"Customer or vendor contract nearing end", freq:"~45/day", topic:"sap/s4/PRD/ce/sap/s4/beh/contract/v1/Contract/Expiring/v1"},
+    {id:"cost_overrun", name:"CostCenter.BudgetExceeded", desc:"Cost center exceeded planned budget", freq:"~60/day", topic:"sap/s4/PRD/ce/sap/s4/beh/costcenter/v1/CostCenter/BudgetExceeded/v1"}
   ],
   s4op: [
     {id:"so_created", name:"SalesOrder.Created", desc:"New sales order is booked", freq:"~2,400/day"},
@@ -470,9 +477,14 @@ function showStep(n) {
 }
 
 // ─── STEP LOGIC ───
+function capitalizeCompany(str) {
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function nextStep() {
   if (currentStep === 1) {
-    state.company = document.getElementById("companyName").value.trim() || "Your Organization";
+    const raw = document.getElementById("companyName").value.trim() || "Your Organization";
+    state.company = capitalizeCompany(raw);
     showStep(2);
     renderSystems();
   } else if (currentStep === 2) {
@@ -525,8 +537,9 @@ function renderEvents() {
   const list = document.getElementById("eventList");
   list.innerHTML = events.map(ev => `
     <div class="event-item" data-id="${ev.id}" onclick="selectEvent('${ev.id}')">
-      <div><div class="ev-name">${ev.name}</div><div class="ev-desc">${ev.desc}</div></div>
-      <div class="ev-freq">${ev.freq}</div>
+      <div class="ev-top"><div class="ev-name">${ev.name}</div><div class="ev-freq">${ev.freq}</div></div>
+      <div class="ev-desc">${ev.desc}</div>
+      ${ev.topic ? `<div class="ev-topic">${ev.topic}</div>` : ''}
     </div>`).join("");
 }
 
@@ -561,10 +574,15 @@ function selectAgent(idx) {
 function renderOutputs() {
   const outputs = OUTPUT_EVENTS[state.agent.name] || OUTPUT_EVENTS._default;
   const list = document.getElementById("outputList");
-  list.innerHTML = outputs.map((ev, i) => `
-    <div class="event-item" data-idx="${i}" onclick="selectOutput(${i})">
-      <div><div class="ev-name">${ev.name}</div><div class="ev-desc">${ev.desc}</div></div>
-    </div>`).join("");
+  const agentPrefix = state.agent.name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  list.innerHTML = outputs.map((ev, i) => {
+    const topic = `acme/agent/${agentPrefix}/${ev.name.replace('.','/')}/v1`.toLowerCase();
+    return `<div class="event-item" data-idx="${i}" onclick="selectOutput(${i})">
+      <div class="ev-top"><div class="ev-name">${ev.name}</div></div>
+      <div class="ev-desc">${ev.desc}</div>
+      <div class="ev-topic">${topic}</div>
+    </div>`;
+  }).join("");
 }
 
 function selectOutput(idx) {
@@ -618,6 +636,8 @@ Use HTML formatting with <h3> for headers, <strong> for emphasis, <ul>/<li> for 
 
 // ─── INIT ───
 renderProgress();
+
+
 document.getElementById("companyName").addEventListener("keydown", e => {
   if (e.key === "Enter") nextStep();
 });
